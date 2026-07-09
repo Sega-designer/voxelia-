@@ -1,0 +1,246 @@
+/* Блок-Страйк: стили поверх базового style.css */
+
+.cs-title {
+  text-shadow:
+    0 4px 0 #7a4614,
+    0 8px 0 rgba(0,0,0,0.35),
+    0 0 40px rgba(232, 160, 32, 0.5) !important;
+}
+
+/* ---------- лобби ---------- */
+.lobby-teams { display: flex; gap: 18px; }
+.team-col {
+  width: min(280px, 42vw);
+  background: var(--panel);
+  border: 2px solid #1c222d; border-radius: 8px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.team-col h3 { text-align: center; letter-spacing: 0.15em; font-size: 16px; }
+.team-col.ct h3 { color: #7da7ff; }
+.team-col.t h3 { color: #ffb35e; }
+.team-list { display: flex; flex-direction: column; gap: 6px; min-height: 130px; }
+.team-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px; padding: 6px 10px; font-size: 14px;
+}
+.team-row .diff { font-size: 11px; color: #8a95a3; margin-left: 8px; }
+.team-row.me { border: 1px solid var(--accent); }
+.team-row .kick {
+  background: none; border: none; color: #e06060;
+  font-size: 15px; cursor: pointer; font-weight: 900;
+}
+.add-bot-row { display: flex; gap: 8px; }
+.add-bot-row select, .lobby-settings select {
+  flex: 1; padding: 6px; font-family: inherit; font-size: 13px;
+  background: #232a36; color: var(--text);
+  border: 2px solid #1c222d; border-radius: 4px;
+}
+.mbtn.small { padding: 7px 14px; font-size: 14px; border-bottom-width: 3px; }
+.lobby-settings {
+  display: flex; gap: 16px; align-items: center;
+  font-size: 14px;
+}
+.lobby-settings label { display: flex; align-items: center; gap: 8px; }
+.lobby-actions { flex-direction: row !important; width: auto !important; }
+.keys-subtitle { font-size: 18px; letter-spacing: 0.08em; }
+
+/* ---------- выбор оружия ---------- */
+.weapon-cards { display: flex; gap: 14px; }
+.wcard {
+  width: 150px; padding: 16px 12px;
+  background: var(--panel);
+  border: 2px solid #2a3240; border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  position: relative;
+}
+.wcard:hover, .wcard.hot { border-color: #ffd45e; transform: translateY(-4px) scale(1.04); }
+.wcard b { font-size: 17px; }
+.wcard .num {
+  position: absolute; top: 6px; left: 9px;
+  color: #ffd45e; font-weight: 900; font-size: 14px;
+}
+.wdesc { font-size: 11px; color: #8a95a3; text-align: center; }
+.wicon { width: 90px; height: 40px; image-rendering: pixelated; }
+.wicon.ak { background: linear-gradient(transparent 40%, #2a2d33 40%, #2a2d33 60%, transparent 60%), linear-gradient(90deg, #7a4a22 0 18%, #2a2d33 18% 85%, #1c1e22 85%); clip-path: polygon(0 30%, 100% 30%, 100% 65%, 55% 65%, 45% 100%, 30% 100%, 35% 65%, 0 65%); }
+.wicon.awp { background: linear-gradient(90deg, #3c5232 0 75%, #22252a 75%); clip-path: polygon(0 35%, 20% 35%, 25% 15%, 45% 15%, 45% 35%, 100% 40%, 100% 55%, 0 70%); }
+.wicon.deagle { background: #8a9098; clip-path: polygon(0 20%, 100% 20%, 100% 45%, 30% 50%, 30% 100%, 10% 100%, 5% 45%, 0 45%); }
+.wicon.knife { background: linear-gradient(90deg, #b8c4cc 0 60%, #2a2016 60%); clip-path: polygon(0 45%, 55% 30%, 60% 40%, 100% 40%, 100% 60%, 0 60%); }
+.select-timer { font-size: 20px; font-weight: 800; color: #ffd45e; }
+.select-hint { font-size: 13px; color: #8a95a3; }
+
+#wpn-slots {
+  position: absolute; bottom: 84px; right: 18px;
+  display: flex; gap: 8px; align-items: center;
+  font-size: 13px; font-weight: 700; color: #8a95a3;
+}
+#wpn-slots span {
+  background: rgba(10, 13, 20, 0.6);
+  padding: 4px 10px; border-radius: 4px;
+  border: 1px solid transparent;
+}
+#wpn-slots span.on { color: #ffd45e; border-color: #ffd45e; }
+#wpn-slots .hint { color: #5a6472; font-weight: 400; background: none; }
+#wpn-slots.hidden { display: none; }
+
+#hs-pop {
+  position: absolute; left: 50%; top: 40%;
+  transform: translateX(-50%);
+  color: #ff4030; font-size: 24px; font-weight: 900;
+  letter-spacing: 0.12em; text-shadow: 0 2px 0 #000;
+  animation: hs-pop 0.7s ease;
+}
+#hs-pop.hidden { display: none; }
+@keyframes hs-pop {
+  0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+  20% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.match-score { font-size: 42px; font-weight: 900; letter-spacing: 0.1em; text-shadow: 0 3px 0 rgba(0,0,0,0.5); }
+
+/* ---------- HUD ---------- */
+#cs-hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+#cs-hud.hidden { display: none; }
+
+#cs-crosshair {
+  position: absolute; left: 50%; top: 50%;
+  width: 0; height: 0;
+}
+#cs-crosshair i {
+  position: absolute; background: rgba(80, 255, 120, 0.9);
+  box-shadow: 0 0 2px #000;
+}
+#cs-crosshair i:nth-child(1) { width: 2px; height: 7px; left: -1px; top: -12px; }
+#cs-crosshair i:nth-child(2) { width: 2px; height: 7px; left: -1px; top: 5px; }
+#cs-crosshair i:nth-child(3) { width: 7px; height: 2px; left: -12px; top: -1px; }
+#cs-crosshair i:nth-child(4) { width: 7px; height: 2px; left: 5px; top: -1px; }
+#cs-crosshair.hidden { display: none; }
+
+#hitmarker {
+  position: absolute; left: 50%; top: 50%;
+  width: 24px; height: 24px; margin: -12px 0 0 -12px;
+  opacity: 0; transition: opacity 0.15s ease;
+  background:
+    linear-gradient(45deg, transparent 42%, #fff 42%, #fff 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, #fff 42%, #fff 58%, transparent 58%);
+  clip-path: polygon(0 0, 30% 0, 50% 35%, 70% 0, 100% 0, 100% 30%, 65% 50%, 100% 70%, 100% 100%, 70% 100%, 50% 65%, 30% 100%, 0 100%, 0 70%, 35% 50%, 0 30%);
+}
+#hitmarker.head { filter: drop-shadow(0 0 4px #ff3030); }
+
+#cs-hp {
+  position: absolute; bottom: 16px; left: 18px;
+  font-size: 34px; font-weight: 900;
+  color: #fff; text-shadow: 0 2px 0 #000;
+  display: flex; align-items: center; gap: 8px;
+}
+.hp-icon { color: #5fbf4a; font-size: 24px; }
+#cs-hp.low { color: #ff5040; animation: pulse 1s ease-in-out infinite; }
+
+#cs-ammo {
+  position: absolute; bottom: 16px; right: 18px;
+  text-align: right;
+  font-size: 34px; font-weight: 900;
+  color: #fff; text-shadow: 0 2px 0 #000;
+}
+#ammo-reserve { font-size: 18px; color: #b9c2cc; margin-left: 6px; }
+#wpn-name { font-size: 13px; color: #ffd45e; letter-spacing: 0.1em; }
+#cs-ammo.reloading #ammo-num { color: #ffd45e; }
+
+#cs-top {
+  position: absolute; top: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 16px; align-items: center;
+  background: rgba(10, 13, 20, 0.6);
+  padding: 6px 20px; border-radius: 6px;
+  border: 2px solid rgba(0,0,0,0.5);
+  font-size: 24px; font-weight: 900;
+  flex-wrap: wrap; justify-content: center;
+}
+.sc-ct { color: #7da7ff; }
+.sc-t { color: #ffb35e; }
+#round-timer { color: #fff; min-width: 70px; text-align: center; }
+#round-timer.low { color: #ff5040; }
+#round-num { width: 100%; text-align: center; font-size: 11px; color: #8a95a3; font-weight: 400; }
+
+#killfeed {
+  position: absolute; top: 14px; right: 16px;
+  display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+}
+.kf-row {
+  background: rgba(10, 13, 20, 0.7);
+  padding: 4px 10px; border-radius: 4px;
+  font-size: 13px; font-weight: 700;
+}
+.kf-row .ct { color: #7da7ff; } .kf-row .t { color: #ffb35e; }
+.kf-row .wpn { color: #b9c2cc; margin: 0 6px; font-weight: 400; }
+.kf-row .hs { color: #ff5040; }
+
+#round-banner {
+  position: absolute; top: 26%; left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px; font-weight: 900; letter-spacing: 0.1em;
+  text-shadow: 0 4px 0 rgba(0,0,0,0.6);
+  animation: banner-in 0.3s ease;
+  text-align: center;
+}
+@keyframes banner-in { from { transform: translateX(-50%) scale(0.6); opacity: 0; } }
+#round-banner.hidden { display: none; }
+#round-banner.win { color: #6fe05a; }
+#round-banner.lose { color: #ff5040; }
+#round-banner.info { color: #ffd45e; font-size: 30px; }
+
+#spectate-label {
+  position: absolute; bottom: 90px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px; color: #b9c2cc;
+  background: rgba(10,13,20,0.6); padding: 8px 16px; border-radius: 6px;
+}
+#spectate-label.hidden { display: none; }
+
+#cs-damage-overlay {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  background: radial-gradient(transparent 40%, rgba(200, 20, 20, 0.55));
+  transition: opacity 0.15s ease;
+}
+
+#cs-room-info {
+  position: absolute; top: 68px; right: 16px;
+  background: rgba(10, 13, 20, 0.65); border-radius: 6px;
+  border: 2px solid rgba(0,0,0,0.5);
+  padding: 6px 12px; font-size: 13px; font-weight: 700; text-align: right;
+}
+#cs-room-info .code { color: #ffd45e; font-size: 16px; }
+#cs-room-info.hidden { display: none; }
+
+/* ---------- прицел АВП ---------- */
+#scope-overlay { position: absolute; inset: 0; }
+#scope-overlay.hidden { display: none; }
+.scope-circle {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 34vmin, rgba(0,0,0,0.97) 35vmin);
+}
+.scope-h, .scope-v { position: absolute; background: rgba(0,0,0,0.8); }
+.scope-h { left: 0; right: 0; top: 50%; height: 2px; }
+.scope-v { top: 0; bottom: 0; left: 50%; width: 2px; }
+
+/* ---------- таблица счёта ---------- */
+#scoreboard {
+  position: fixed; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 13, 20, 0.92);
+  border: 2px solid #1c222d; border-radius: 10px;
+  padding: 20px 28px;
+  z-index: 20; min-width: 380px;
+}
+#scoreboard.hidden { display: none; }
+#scoreboard h3 { color: #7da7ff; font-size: 16px; letter-spacing: 0.1em; margin-bottom: 6px; }
+#scoreboard h3.t-head { color: #ffb35e; margin-top: 14px; }
+#scoreboard table { width: 100%; border-collapse: collapse; font-size: 14px; }
+#scoreboard td { padding: 3px 10px; }
+#scoreboard td.num { text-align: right; color: #b9c2cc; }
+#scoreboard tr.dead td { color: #6a7280; }
+#scoreboard tr.me td:first-child { color: #ffd45e; }

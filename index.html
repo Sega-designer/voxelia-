@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вокселия — воксельная песочница</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="game-canvas"></canvas>
+
+<!-- ГЛАВНОЕ МЕНЮ -->
+<div id="main-menu" class="screen">
+  <h1 class="game-title">ВОКСЕЛИЯ</h1>
+  <p class="game-subtitle">воксельная песочница</p>
+  <div class="menu-buttons">
+    <button class="mbtn" id="btn-play">Играть</button>
+    <button class="mbtn" id="btn-mp">Сетевая игра</button>
+    <button class="mbtn cs-btn" id="btn-cs">⚔ Блок-Страйк</button>
+    <button class="mbtn" id="btn-settings">Настройки</button>
+    <button class="mbtn" id="btn-controls">Управление</button>
+  </div>
+  <p class="footer-note">Оригинальная браузерная игра · Three.js</p>
+</div>
+
+<!-- ВЫБОР МИРА -->
+<div id="world-menu" class="screen hidden">
+  <h2 class="menu-title">Мир</h2>
+  <div class="menu-buttons">
+    <button class="mbtn" id="btn-continue" disabled>Продолжить</button>
+    <div class="seed-row">
+      <input type="text" id="seed-input" placeholder="Сид (пусто = случайный)" maxlength="20">
+    </div>
+    <button class="mbtn" id="btn-mode">Режим: Выживание</button>
+    <button class="mbtn accent" id="btn-newworld">Новый мир</button>
+    <button class="mbtn" id="btn-world-back">Назад</button>
+  </div>
+</div>
+
+<!-- СЕТЕВАЯ ИГРА -->
+<div id="mp-menu" class="screen hidden">
+  <h2 class="menu-title">Сетевая игра</h2>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-mp-host-new">Создать комнату — новый мир</button>
+    <button class="mbtn" id="btn-mp-host-continue" disabled>Создать комнату — мой мир</button>
+    <button class="mbtn" id="btn-mp-mode">Режим: Выживание</button>
+    <div class="mp-divider">— или —</div>
+    <div class="seed-row">
+      <input type="text" id="mp-code" placeholder="Код комнаты от друга" maxlength="8" autocomplete="off">
+    </div>
+    <button class="mbtn" id="btn-mp-join">Присоединиться</button>
+    <p id="mp-status" class="mp-status"></p>
+    <button class="mbtn" id="btn-mp-back">Назад</button>
+  </div>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="settings-menu" class="screen hidden">
+  <h2 class="menu-title">Настройки</h2>
+  <div class="settings-list">
+    <label>Чувствительность мыши <span id="val-sens">1.0</span>
+      <input type="range" id="set-sens" min="0.2" max="3" step="0.1" value="1"></label>
+    <label>Громкость <span id="val-vol">70%</span>
+      <input type="range" id="set-vol" min="0" max="1" step="0.05" value="0.7"></label>
+    <label>Дальность прорисовки <span id="val-dist">5</span>
+      <input type="range" id="set-dist" min="2" max="10" step="1" value="5"></label>
+    <label>Качество графики
+      <select id="set-quality">
+        <option value="low">Низкое</option>
+        <option value="medium" selected>Среднее</option>
+        <option value="high">Высокое</option>
+      </select></label>
+    <label class="checkbox-row">Тени
+      <input type="checkbox" id="set-shadows"></label>
+  </div>
+  <button class="mbtn" id="btn-keys">Клавиши управления</button>
+  <button class="mbtn" id="btn-settings-back">Назад</button>
+</div>
+
+<!-- КЛАВИШИ -->
+<div id="keys-menu" class="screen hidden">
+  <h2 class="menu-title">Клавиши</h2>
+  <div class="settings-list" id="bind-editor"></div>
+  <button class="mbtn" id="btn-keys-back">Назад</button>
+</div>
+
+<!-- УПРАВЛЕНИЕ -->
+<div id="controls-menu" class="screen hidden">
+  <h2 class="menu-title">Управление</h2>
+  <div class="controls-list">
+    <div><b>W A S D</b><span>движение</span></div>
+    <div><b>Мышь</b><span>обзор</span></div>
+    <div><b>Пробел</b><span>прыжок / плыть вверх</span></div>
+    <div><b>Shift</b><span>бег</span></div>
+    <div><b>Ctrl / C</b><span>присесть</span></div>
+    <div><b>ЛКМ</b><span>ломать блок (удерживать)</span></div>
+    <div><b>ПКМ</b><span>поставить блок</span></div>
+    <div><b>Колесо / 1–9</b><span>выбор блока</span></div>
+    <div><b>E</b><span>рюкзак (перетаскивание мышью)</span></div>
+    <div><b>Q</b><span>выбросить блок из рук</span></div>
+    <div><b>F5</b><span>смена камеры</span></div>
+    <div><b>F3</b><span>отладочная информация</span></div>
+    <div><b>Esc</b><span>пауза</span></div>
+  </div>
+  <button class="mbtn" id="btn-controls-back">Назад</button>
+</div>
+
+<!-- ПАУЗА -->
+<div id="pause-menu" class="screen hidden">
+  <h2 class="menu-title">Пауза</h2>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-resume">Продолжить</button>
+    <button class="mbtn" id="btn-gamemode">Режим: Творческий</button>
+    <button class="mbtn" id="btn-pause-settings">Настройки</button>
+    <button class="mbtn" id="btn-pause-controls">Управление</button>
+    <button class="mbtn" id="btn-exit-menu">Сохранить и выйти</button>
+  </div>
+</div>
+
+<!-- ЗАГРУЗКА -->
+<div id="loading" class="screen hidden">
+  <h2 class="menu-title">Создание мира…</h2>
+  <div class="loadbar"><div id="loadbar-fill"></div></div>
+</div>
+
+<!-- КЛИК ДЛЯ ИГРЫ -->
+<div id="click-to-play" class="screen hidden transparent">
+  <div class="click-hint">Нажмите, чтобы играть</div>
+</div>
+
+<!-- ЭКРАН СМЕРТИ -->
+<div id="death-screen" class="screen hidden red">
+  <h2 class="menu-title">Вы погибли</h2>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-respawn">Возродиться</button>
+    <button class="mbtn" id="btn-death-menu">В главное меню</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="crosshair">+</div>
+  <div id="break-progress"><div id="break-fill"></div></div>
+  <div id="hearts"></div>
+  <div id="hotbar"></div>
+  <div id="underwater-overlay"></div>
+  <div id="lightning-overlay"></div>
+  <div id="damage-overlay"></div>
+  <div id="debug-info" class="hidden"></div>
+  <div id="room-info" class="hidden"></div>
+</div>
+
+<!-- ИНВЕНТАРЬ -->
+<div id="inventory" class="screen hidden transparent">
+  <div class="inv-panel">
+    <h3 id="inv-title">Рюкзак</h3>
+    <div id="inv-grid"></div>
+    <div id="inv-hotbar-row"></div>
+    <p class="inv-hint" id="inv-hint"></p>
+  </div>
+</div>
+<div id="drag-ghost"></div>
+
+<script src="lib/peerjs.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

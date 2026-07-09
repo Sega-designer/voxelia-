@@ -1,0 +1,298 @@
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+:root {
+  --panel: rgba(12, 16, 26, 0.82);
+  --accent: #5fbf4a;
+  --accent-dark: #3d8a2e;
+  --text: #e8eef2;
+}
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+body {
+  font-family: "Segoe UI", Verdana, sans-serif;
+  color: var(--text);
+}
+
+#game-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* ---------- Экраны ---------- */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px;
+  background: linear-gradient(rgba(8, 10, 18, 0.45), rgba(8, 10, 18, 0.65));
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+.screen.hidden { display: none; opacity: 0; }
+.screen.transparent { background: rgba(4, 6, 10, 0.55); }
+.screen.red { background: radial-gradient(rgba(120, 10, 10, 0.55), rgba(40, 0, 0, 0.8)); }
+
+.game-title {
+  font-size: clamp(44px, 9vw, 96px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow:
+    0 4px 0 #2d6b1f,
+    0 8px 0 rgba(0,0,0,0.35),
+    0 0 40px rgba(95, 191, 74, 0.5);
+  animation: title-bob 3.2s ease-in-out infinite;
+}
+@keyframes title-bob {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-8px) rotate(0.5deg); }
+}
+.game-subtitle {
+  margin-top: -8px;
+  font-size: 15px; letter-spacing: 0.35em;
+  color: #b9cf9e; text-transform: uppercase;
+}
+.menu-title {
+  font-size: 34px; font-weight: 800; letter-spacing: 0.1em;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.5);
+  margin-bottom: 8px;
+}
+.footer-note { position: absolute; bottom: 14px; font-size: 12px; color: #8a95a3; }
+
+/* ---------- Кнопки ---------- */
+.menu-buttons { display: flex; flex-direction: column; gap: 12px; width: min(340px, 82vw); }
+
+.mbtn {
+  padding: 13px 22px;
+  font-size: 17px; font-weight: 700;
+  font-family: inherit;
+  color: var(--text);
+  background: linear-gradient(#4a5568, #3a4353);
+  border: 2px solid #1c222d;
+  border-bottom-width: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform 0.08s ease, filter 0.12s ease;
+}
+.mbtn:hover:not(:disabled) { filter: brightness(1.2); transform: translateY(-2px); }
+.mbtn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 3px; }
+.mbtn:disabled { opacity: 0.4; cursor: default; }
+.mbtn.accent { background: linear-gradient(var(--accent), var(--accent-dark)); border-color: #1e4a14; }
+
+.seed-row input {
+  width: 100%; padding: 11px 14px;
+  font-size: 15px; font-family: inherit;
+  color: var(--text);
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #1c222d; border-radius: 4px;
+  outline: none;
+}
+.seed-row input:focus { border-color: var(--accent); }
+
+/* ---------- Настройки ---------- */
+.settings-list {
+  display: flex; flex-direction: column; gap: 16px;
+  width: min(400px, 85vw);
+  background: var(--panel);
+  padding: 22px 26px; border-radius: 8px;
+  border: 2px solid #1c222d;
+}
+.settings-list label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.settings-list label span { float: right; color: var(--accent); font-weight: 700; }
+.settings-list input[type="range"] { accent-color: var(--accent); height: 22px; }
+.settings-list select {
+  padding: 8px; font-family: inherit; font-size: 15px;
+  background: #232a36; color: var(--text);
+  border: 2px solid #1c222d; border-radius: 4px;
+}
+.checkbox-row { flex-direction: row !important; align-items: center; justify-content: space-between; }
+.checkbox-row input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+/* ---------- Управление ---------- */
+.controls-list {
+  display: flex; flex-direction: column; gap: 7px;
+  width: min(420px, 85vw);
+  background: var(--panel);
+  padding: 20px 26px; border-radius: 8px;
+  border: 2px solid #1c222d;
+  max-height: 60vh; overflow-y: auto;
+}
+.controls-list div { display: flex; justify-content: space-between; font-size: 15px; }
+.controls-list b { color: #ffd45e; min-width: 120px; }
+.controls-list span { color: #c4cdd8; }
+
+/* ---------- Загрузка ---------- */
+.loadbar {
+  width: min(380px, 80vw); height: 22px;
+  background: rgba(0,0,0,0.6);
+  border: 2px solid #1c222d; border-radius: 4px;
+  overflow: hidden;
+}
+#loadbar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(var(--accent), var(--accent-dark));
+  transition: width 0.15s linear;
+}
+.click-hint {
+  font-size: 26px; font-weight: 800; letter-spacing: 0.08em;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.6);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+/* ---------- HUD ---------- */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+#hud.hidden { display: none; }
+
+#crosshair {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px; color: rgba(255,255,255,0.85);
+  text-shadow: 0 0 3px #000;
+}
+#break-progress {
+  position: absolute; left: 50%; top: calc(50% + 24px);
+  transform: translateX(-50%);
+  width: 44px; height: 6px;
+  background: rgba(0,0,0,0.5); border-radius: 3px;
+  overflow: hidden; opacity: 0;
+}
+#break-progress.active { opacity: 1; }
+#break-fill { height: 100%; width: 0%; background: #ffd45e; }
+
+#hotbar {
+  position: absolute; bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 4px;
+  background: rgba(10, 13, 20, 0.6);
+  padding: 5px; border-radius: 6px;
+  border: 2px solid rgba(0,0,0,0.55);
+}
+.hslot {
+  width: 48px; height: 48px;
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(255,255,255,0.16);
+  border-radius: 4px;
+  background-size: 80% 80%;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  position: relative;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+.hslot.selected { border-color: #ffd45e; transform: scale(1.12); box-shadow: 0 0 10px rgba(255, 212, 94, 0.5); }
+.hslot .num { position: absolute; top: 1px; left: 3px; font-size: 10px; color: rgba(255,255,255,0.55); }
+
+#hearts {
+  position: absolute; bottom: 78px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 3px;
+}
+.heart { width: 18px; height: 18px; font-size: 16px; line-height: 18px; filter: drop-shadow(0 1px 1px #000); }
+
+#underwater-overlay, #lightning-overlay, #damage-overlay {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#underwater-overlay { background: rgba(20, 65, 140, 0.35); }
+#lightning-overlay { background: rgba(255, 255, 255, 0.85); transition: opacity 0.1s ease; }
+#damage-overlay { background: radial-gradient(transparent 40%, rgba(200, 20, 20, 0.5)); transition: opacity 0.15s ease; }
+
+#debug-info {
+  position: absolute; top: 10px; left: 10px;
+  font: 12px/1.5 Consolas, monospace;
+  color: #fff; text-shadow: 1px 1px 0 #000;
+  background: rgba(0,0,0,0.35);
+  padding: 8px 10px; border-radius: 4px;
+  white-space: pre;
+}
+#debug-info.hidden { display: none; }
+
+#room-info {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(10, 13, 20, 0.65);
+  border: 2px solid rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 15px; font-weight: 700;
+  color: #fff; text-align: right;
+  letter-spacing: 0.06em;
+}
+#room-info .code { color: #ffd45e; font-size: 18px; }
+#room-info.hidden { display: none; }
+
+.mp-status { min-height: 22px; font-size: 14px; color: #ffd45e; text-align: center; }
+.mp-divider { text-align: center; color: #8a95a3; font-size: 13px; margin: 2px 0; }
+
+/* ---------- Редактор клавиш ---------- */
+.mbtn.cs-btn { background: linear-gradient(#a8651f, #7a4614); border-color: #4a2a0c; }
+#bind-editor, .bind-list { max-height: 55vh; overflow-y: auto; }
+.bind-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px; font-size: 15px; padding: 2px 0;
+}
+.bind-btn {
+  min-width: 130px; padding: 7px 12px;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  color: var(--text);
+  background: #232a36;
+  border: 2px solid #1c222d; border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.1s ease;
+}
+.bind-btn:hover { border-color: var(--accent); }
+.bind-btn.capturing { border-color: #ffd45e; color: #ffd45e; animation: pulse 1s ease-in-out infinite; }
+
+/* ---------- Инвентарь ---------- */
+.inv-panel {
+  background: var(--panel);
+  border: 2px solid #1c222d; border-radius: 8px;
+  padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 14px; align-items: center;
+  animation: inv-in 0.18s ease;
+}
+@keyframes inv-in { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.inv-panel h3 { font-size: 20px; letter-spacing: 0.08em; }
+#inv-grid {
+  display: grid; grid-template-columns: repeat(6, 52px); gap: 6px;
+}
+#inv-grid.palette { grid-template-columns: repeat(7, 52px); }
+#inv-hotbar-row {
+  display: grid; grid-template-columns: repeat(9, 52px); gap: 6px;
+  padding-top: 12px; margin-top: 4px;
+  border-top: 2px solid rgba(255,255,255,0.14);
+}
+#inv-hotbar-row .islot.selected { border-color: #ffd45e; }
+.islot {
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(255,255,255,0.16);
+  border-radius: 4px; cursor: pointer;
+  background-size: 80% 80%; background-position: center; background-repeat: no-repeat;
+  image-rendering: pixelated;
+  transition: transform 0.08s ease, border-color 0.08s ease;
+  position: relative;
+  touch-action: none;
+}
+.islot:hover { border-color: #ffd45e; transform: scale(1.1); }
+
+.islot .cnt, .hslot .cnt {
+  position: absolute; bottom: 1px; right: 4px;
+  font-size: 12px; font-weight: 800; color: #fff;
+  text-shadow: 1px 1px 0 #000, -1px 1px 0 #000;
+  pointer-events: none;
+}
+
+#drag-ghost {
+  position: fixed; width: 44px; height: 44px;
+  display: none; pointer-events: none; z-index: 200;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.6));
+}
+.inv-hint { font-size: 12px; color: #8a95a3; }

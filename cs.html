@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Блок-Страйк — воксельное ПВП</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/cs.css">
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="game-canvas"></canvas>
+
+<!-- ГЛАВНОЕ МЕНЮ БЛОК-СТРАЙКА -->
+<div id="cs-menu" class="screen">
+  <h1 class="game-title cs-title">БЛОК·СТРАЙК</h1>
+  <p class="game-subtitle">воксельное пвп · карта «Дюна-2»</p>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-bots">Игра с ботами</button>
+    <button class="mbtn" id="btn-cs-mp">Сетевая игра</button>
+    <button class="mbtn" id="btn-cs-settings">Настройки</button>
+    <button class="mbtn" id="btn-to-sandbox">← Вокселия (песочница)</button>
+  </div>
+</div>
+
+<!-- СЕТЕВАЯ ИГРА -->
+<div id="cs-mp-menu" class="screen hidden">
+  <h2 class="menu-title">Сетевая игра</h2>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-cs-host">Создать комнату</button>
+    <div class="mp-divider">— или —</div>
+    <div class="seed-row">
+      <input type="text" id="cs-code" placeholder="Код комнаты от друга" maxlength="8" autocomplete="off">
+    </div>
+    <button class="mbtn" id="btn-cs-join">Присоединиться</button>
+    <p id="cs-mp-status" class="mp-status"></p>
+    <button class="mbtn" id="btn-cs-mp-back">Назад</button>
+  </div>
+</div>
+
+<!-- ЛОББИ -->
+<div id="lobby" class="screen hidden">
+  <h2 class="menu-title">Лобби</h2>
+  <p id="lobby-room" class="mp-status"></p>
+  <div class="lobby-teams">
+    <div class="team-col ct">
+      <h3>СПЕЦНАЗ</h3>
+      <div id="ct-list" class="team-list"></div>
+      <div class="add-bot-row">
+        <select id="ct-diff"><option value="easy">Лёгкий</option><option value="normal" selected>Средний</option><option value="hard">Сложный</option></select>
+        <button class="mbtn small" id="btn-add-ct">+ Бот</button>
+      </div>
+    </div>
+    <div class="team-col t">
+      <h3>ШТУРМ</h3>
+      <div id="t-list" class="team-list"></div>
+      <div class="add-bot-row">
+        <select id="t-diff"><option value="easy">Лёгкий</option><option value="normal" selected>Средний</option><option value="hard">Сложный</option></select>
+        <button class="mbtn small" id="btn-add-t">+ Бот</button>
+      </div>
+    </div>
+  </div>
+  <div class="lobby-settings">
+    <label>Матч до
+      <select id="cfg-target"><option value="7">7 побед</option><option value="12" selected>12 побед</option><option value="16">16 побед</option></select>
+    </label>
+    <label>Раунд
+      <select id="cfg-time"><option value="75">1:15</option><option value="105" selected>1:45</option><option value="135">2:15</option></select>
+    </label>
+    <button class="mbtn small" id="btn-switch-team">Сменить команду</button>
+  </div>
+  <div class="menu-buttons lobby-actions">
+    <button class="mbtn accent" id="btn-start-match">Начать матч</button>
+    <button class="mbtn" id="btn-lobby-back">Назад</button>
+  </div>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="cs-settings" class="screen hidden">
+  <h2 class="menu-title">Настройки</h2>
+  <div class="settings-list">
+    <label>Чувствительность мыши <span id="cs-val-sens">1.0</span>
+      <input type="range" id="cs-set-sens" min="0.2" max="3" step="0.1" value="1"></label>
+    <label>Громкость <span id="cs-val-vol">70%</span>
+      <input type="range" id="cs-set-vol" min="0" max="1" step="0.05" value="0.7"></label>
+  </div>
+  <h3 class="keys-subtitle">Клавиши</h3>
+  <div class="settings-list bind-list" id="cs-bind-editor"></div>
+  <button class="mbtn" id="btn-cs-settings-back">Назад</button>
+</div>
+
+<!-- ПАУЗА -->
+<div id="cs-pause" class="screen hidden">
+  <h2 class="menu-title">Пауза</h2>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-cs-resume">Продолжить</button>
+    <button class="mbtn" id="btn-cs-pause-settings">Настройки</button>
+    <button class="mbtn" id="btn-cs-leave">Покинуть матч</button>
+  </div>
+</div>
+
+<!-- ВЫБОР ОРУЖИЯ -->
+<div id="weapon-select" class="screen hidden transparent">
+  <h2 class="menu-title">Выбери оружие</h2>
+  <div class="weapon-cards">
+    <div class="wcard" data-wpn="ak"><span class="num">1</span><div class="wicon ak"></div><b>Калаш</b><span class="wdesc">27 урона · голова — мгновенно</span></div>
+    <div class="wcard" data-wpn="awp"><span class="num">2</span><div class="wicon awp"></div><b>АВП</b><span class="wdesc">ваншот · зум на ПКМ</span></div>
+    <div class="wcard" data-wpn="deagle"><span class="num">3</span><div class="wicon deagle"></div><b>Дигл</b><span class="wdesc">40 урона · точные одиночные</span></div>
+    <div class="wcard" data-wpn="knife"><span class="num">4</span><div class="wicon knife"></div><b>Нож</b><span class="wdesc">в спину ×3 · быстрый бег</span></div>
+  </div>
+  <p class="select-hint">Нож всегда с собой — колёсико мыши переключает</p>
+  <p class="select-timer" id="select-timer"></p>
+</div>
+
+<!-- КОНЕЦ МАТЧА -->
+<div id="match-end" class="screen hidden">
+  <h2 class="menu-title" id="match-result">Победа!</h2>
+  <p class="match-score" id="match-score">12 : 8</p>
+  <div class="menu-buttons">
+    <button class="mbtn accent" id="btn-back-lobby">В лобби</button>
+  </div>
+</div>
+
+<!-- КЛИК ДЛЯ ИГРЫ -->
+<div id="cs-click" class="screen hidden transparent">
+  <div class="click-hint">Нажмите, чтобы играть</div>
+</div>
+
+<!-- HUD -->
+<div id="cs-hud" class="hidden">
+  <div id="cs-crosshair"><i></i><i></i><i></i><i></i></div>
+  <div id="hitmarker"></div>
+  <div id="cs-hp"><span class="hp-icon">＋</span><span id="hp-num">100</span></div>
+  <div id="cs-ammo"><span id="ammo-num">30</span><span id="ammo-reserve">/ 90</span><div id="wpn-name">Калаш</div></div>
+  <div id="wpn-slots" class="hidden"></div>
+  <div id="hs-pop" class="hidden">ХЕДШОТ!</div>
+  <div id="cs-top">
+    <span id="score-ct" class="sc-ct">0</span>
+    <span id="round-timer">1:45</span>
+    <span id="score-t" class="sc-t">0</span>
+    <div id="round-num">Раунд 1</div>
+  </div>
+  <div id="killfeed"></div>
+  <div id="round-banner" class="hidden"></div>
+  <div id="spectate-label" class="hidden"></div>
+  <div id="cs-damage-overlay"></div>
+  <div id="scope-overlay" class="hidden"><div class="scope-circle"></div><div class="scope-h"></div><div class="scope-v"></div></div>
+  <div id="cs-room-info" class="hidden"></div>
+</div>
+
+<!-- ТАБЛИЦА СЧЁТА -->
+<div id="scoreboard" class="hidden">
+  <h3>СПЕЦНАЗ — <span id="sb-ct-score">0</span></h3>
+  <table id="sb-ct"></table>
+  <h3 class="t-head">ШТУРМ — <span id="sb-t-score">0</span></h3>
+  <table id="sb-t"></table>
+</div>
+
+<script src="lib/peerjs.min.js"></script>
+<script type="module" src="js/cs/csmain.js"></script>
+</body>
+</html>
