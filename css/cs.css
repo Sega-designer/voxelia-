@@ -106,6 +106,17 @@
 #cs-hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 #cs-hud.hidden { display: none; }
 
+/* радар (миникарта) — верхний левый угол, как в КС */
+#minimap {
+  position: absolute; top: 12px; left: 12px;
+  width: 176px; height: 176px;
+  border: 2px solid rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  opacity: 0.88;
+  image-rendering: pixelated;
+  background: #2a2418;
+}
+
 #cs-crosshair {
   position: absolute; left: 50%; top: 50%;
   width: 0; height: 0;
@@ -134,19 +145,19 @@
 #cs-hp {
   position: absolute; bottom: 16px; left: 18px;
   font-size: 34px; font-weight: 900;
-  color: #fff; text-shadow: 0 2px 0 #000;
+  color: #f0a830; text-shadow: 0 2px 0 #000; /* классический янтарный КС-худ */
   display: flex; align-items: center; gap: 8px;
 }
-.hp-icon { color: #5fbf4a; font-size: 24px; }
+.hp-icon { color: #f0a830; font-size: 24px; }
 #cs-hp.low { color: #ff5040; animation: pulse 1s ease-in-out infinite; }
 
 #cs-ammo {
   position: absolute; bottom: 16px; right: 18px;
   text-align: right;
   font-size: 34px; font-weight: 900;
-  color: #fff; text-shadow: 0 2px 0 #000;
+  color: #f0a830; text-shadow: 0 2px 0 #000;
 }
-#ammo-reserve { font-size: 18px; color: #b9c2cc; margin-left: 6px; }
+#ammo-reserve { font-size: 18px; color: #b08030; margin-left: 6px; }
 #wpn-name { font-size: 13px; color: #ffd45e; letter-spacing: 0.1em; }
 #cs-ammo.reloading #ammo-num { color: #ffd45e; }
 

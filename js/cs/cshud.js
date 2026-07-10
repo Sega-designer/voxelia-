@@ -5,6 +5,73 @@ import { DIFFICULTIES } from './bots.js';
 const $ = (id) => document.getElementById(id);
 
 export const CsUI = {
+  // ---------- миникарта (радар) ----------
+  _mmBg: null,
+  _mmW: 160, _mmD: 160,
+
+  initMinimap(map, mapW, mapD) {
+    this._mmW = mapW; this._mmD = mapD;
+    const bg = document.createElement('canvas');
+    bg.width = mapW; bg.height = mapD;
+    const g = bg.getContext('2d');
+    const sandShades = ['#c9b988', '#d5c595', '#e0d1a3', '#eaddb2', '#f0e4bd'];
+    for (let z = 0; z < mapD; z++) for (let x = 0; x < mapW; x++) {
+      const h = map.groundY(x, z);
+      let color;
+      if (h >= 6) {
+        color = '#57492f'; // стены/застройка
+      } else {
+        const top = map.getBlock(x, h - 1, z);
+        if (top === 13) color = '#a05540';                    // кирпич (плент)
+        else if (top === 3) color = '#b6b0a2';                // камень (спавны)
+        else if (top === 12) color = '#8a6a3c';               // ящики
+        else color = sandShades[Math.min(4, Math.max(0, h - 1))];
+        // крытые туннели — затемняем
+        if (map.isSolid(x, 5, z) || map.isSolid(x, 6, z)) {
+          color = '#6e5f40';
+        }
+      }
+      g.fillStyle = color;
+      g.fillRect(x, z, 1, 1);
+    }
+    this._mmBg = bg;
+  },
+
+  // teammates: [{x, z, yaw, isMe, alive}]
+  updateMinimap(mates) {
+    const cv = $('minimap');
+    if (!cv || !this._mmBg) return;
+    const g = cv.getContext('2d');
+    const sx = cv.width / this._mmW, sz = cv.height / this._mmD;
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.drawImage(this._mmBg, 0, 0, cv.width, cv.height);
+    for (const m of mates) {
+      if (!m.alive) continue;
+      const px = m.x * sx, pz = m.z * sz;
+      if (m.isMe) {
+        // свой маркер — белая стрелка по направлению взгляда
+        const ang = Math.atan2(-Math.cos(m.yaw), -Math.sin(m.yaw));
+        g.save();
+        g.translate(px, pz);
+        g.rotate(ang);
+        g.fillStyle = '#ffffff';
+        g.strokeStyle = '#000';
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(6, 0); g.lineTo(-4, 4); g.lineTo(-2, 0); g.lineTo(-4, -4);
+        g.closePath();
+        g.fill(); g.stroke();
+        g.restore();
+      } else {
+        g.fillStyle = '#48d858';
+        g.strokeStyle = '#083810';
+        g.beginPath();
+        g.arc(px, pz, 3.2, 0, Math.PI * 2);
+        g.fill(); g.stroke();
+      }
+    }
+  },
+
   show(id) {
     for (const s of document.querySelectorAll('.screen')) s.classList.add('hidden');
     if (id) $(id).classList.remove('hidden');

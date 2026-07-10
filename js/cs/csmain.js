@@ -7,7 +7,7 @@ import { Particles } from '../particles.js';
 import { Input } from '../player/input.js';
 import { Binds, loadBinds, renderBindEditor } from '../keybinds.js';
 import { Net } from '../net.js';
-import { CSMap, SPAWNS } from './csmap.js';
+import { CSMap, SPAWNS, MAP_W, MAP_D } from './csmap.js';
 import { Pawn } from './pawn.js';
 import { WEAPONS, WEAPON_ORDER, WeaponState, shotDir, castShot, damageFor, buildViewModel, Tracers } from './weapons.js';
 import { Bot, buildNav, BOT_NAMES } from './bots.js';
@@ -39,6 +39,7 @@ const materials = createMaterials();
 const map = new CSMap();
 map.addToScene(scene, materials);
 const nav = buildNav(map);
+CsUI.initMinimap(map, MAP_W, MAP_D);
 const particles = new Particles(scene);
 const tracers = new Tracers(scene);
 const input = new Input(canvas);
@@ -751,6 +752,7 @@ function applyLook(dt) {
 let lastT = performance.now();
 let sbVisible = false;
 let sbTimer = 0;
+let mmTimer = 0;
 
 function checkResize() {
   const w = innerWidth, h = innerHeight;
@@ -870,6 +872,19 @@ function updateLive(dt) {
 
   updateViewModel(dt);
   if (net.active) updateNet(dt);
+
+  // радар: я + тиммейты (10 раз/сек)
+  mmTimer += dt;
+  if (mmTimer > 0.1) {
+    mmTimer = 0;
+    const team = myTeam();
+    const mates = [];
+    for (const pw of pawns.values()) {
+      if (pw.team !== team) continue;
+      mates.push({ x: pw.pos.x, z: pw.pos.z, yaw: pw.yaw, isMe: pw.rosterId === myId, alive: pw.alive });
+    }
+    CsUI.updateMinimap(mates);
+  }
 
   // таблица счёта по удержанию Tab
   const sb = input.keys.has(Binds.scoreboard);
